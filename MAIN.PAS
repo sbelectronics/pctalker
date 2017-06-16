@@ -1,0 +1,60 @@
+uses talker;
+
+type
+  TArgs = record
+           driver: TOutputDriver;
+           port: integer;
+           say: string;
+           filename: string;
+         end;
+var
+  args: TArgs;
+
+procedure parse_args;
+var
+  i,code: integer;
+begin;
+  args.driver:=OutputConsole;
+  args.port:=$120;
+  args.say:='';
+  i:=1;
+  while (i<=ParamCount) do begin;
+    if ParamStr(i)='-D' then begin;
+        args.driver:=OutputDirect;
+    end else if ParamStr(i)='-B' then begin;
+        args.driver:=OutputBackground;
+    end else if ParamStr(i)='-P' then begin;
+        val(ParamStr(i+1), args.port, code);
+        i:=i+1;
+    end else if ParamStr(i)='-F' then begin;
+        args.filename:=ParamStr(i+1);
+        i:=i+1;
+    end else begin;
+       if args.say <> '' then args.say:=args.say+' ';
+       args.say := args.say + ParamStr(i);
+    end;
+    i:=i+1;
+  end;
+end;
+
+procedure say_file(fn: string);
+var
+  f: text;
+  s: string;
+begin
+  assign(f, fn);
+  reset(f);
+  while not eof(f) do begin
+      readln(f, s);
+      say_string(s);
+  end;
+end;
+
+begin;
+  parse_args;
+  talker_setup(args.driver, args.port);
+  if args.say<>'' then say_string(args.say);
+  if args.filename<>'' then say_file(args.filename);
+  { stop speech }
+  say_phoneme('PA4');
+end.
