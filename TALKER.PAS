@@ -195,13 +195,17 @@ begin
 end;
 
 procedure parse_char(c: char);
+var
+  junk: boolean;
 begin;
-   if (c=' ') or (c=chr(10)) or (c=chr(13)) then begin;
-      parse_delim;
-   end else begin;
+   if c in ['A'..'Z', 'a'..'z', '0'..'9'] then begin;
+      { valid phonemes are comprised of letters and numbers }
       if length(sym)<255 then begin
-          sym := sym + c;
+          sym := sym + upcase(c);
       end;
+   end else begin;
+      { everything else is a delimiter }
+      parse_delim;
    end;
 end;
 

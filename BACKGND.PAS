@@ -18,6 +18,8 @@ var
   outbuf: array[0..(OUTBUF_SIZE-1)] of byte;
   outbuf_in, outbuf_out: integer;
   outbuf_count: integer;
+  last_code: byte;
+  idle_count: integer;
 
 procedure background_exithandler; far;
 begin;
@@ -66,8 +68,19 @@ var
 begin
   if ((port[sp0256_port] and 2) <> 2) then begin
      if dequeue(code) then begin
-        write(code, ' ');
         port[sp0256_port] := code;
+        last_code:=code;
+        idle_count:=0;
+     end else begin;
+       { check to see if speech was left running without a terminating pause }
+       if (last_code>5) then begin
+         idle_count:=idle_count+1;
+         if (idle_count>10) then begin
+           { terminate speech }
+           port[sp0256_port] := 0;
+           last_code:=0;
+         end;
+       end;
      end;
   end;
 
@@ -84,6 +97,8 @@ begin;
   outbuf_in:=0;
   outbuf_out:=0;
   outbuf_count:=0;
+  last_code:=0;
+  idle_count:=0;
   sp0256_port:=port;
   old_int1c := NIL;
   old_exitproc := ExitProc;
