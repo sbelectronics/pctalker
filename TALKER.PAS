@@ -2,6 +2,8 @@ unit talker;
 
 interface
 
+uses crt, dos, backgnd;
+
 type
  TOutputDriver = (OutputConsole, OutputDirect, OutputBackground);
 
@@ -151,6 +153,22 @@ begin;
   port[sp0256_port] := code;
 end;
 
+procedure output_background(code: integer);
+var
+  i: integer;
+begin
+  i:=0;
+  while not enqueue(code) do begin
+    Delay(100);
+    i:=i+1;
+    if (i>25) then begin;
+        writeln('Timeout waiting for enqueue');
+        Halt;
+    end;
+  end;
+end;
+
+
 procedure say_phoneme(s: string);
 var
   code: integer;
@@ -160,6 +178,7 @@ begin;
      case driver of
        OutputConsole: write(code, ' ');
        OutputDirect: output_direct(code);
+       OutputBackground: output_background(code);
      end;
   end;
 end;
@@ -189,11 +208,15 @@ end;
 
 procedure talker_setup(adriver: TOutputDriver; aport: integer);
 begin
+{  enqueue_dequeue_test; }
+
   driver:=adriver;
   sp0256_port:=aport;
   setup_phonemes;
+
+  if (driver = OutputBackground) then begin
+      setup_background(aport);
+  end;
 end;
 
-{  say_string('SS KK2 AO PA3 TT1');
-  writeln;}
 end.
