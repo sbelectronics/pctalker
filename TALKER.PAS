@@ -8,6 +8,8 @@ type
  TOutputDriver = (OutputConsole, OutputDirect, OutputBackground);
 
 procedure talker_setup(adriver: TOutputDriver; aport: integer);
+procedure parse_char(c: char);
+procedure parse_delim;
 procedure say_string(s: string);
 procedure say_phoneme(s: string);
 
@@ -19,6 +21,7 @@ type
               code: integer;
              end;
 var
+  sym: string; { current symbol being parsed }
   sp0256_port: integer;
   driver: TOutputDriver;
   phoneme_lookup: array[0..63] of TPhoneme;
@@ -183,28 +186,33 @@ begin;
   end;
 end;
 
+procedure parse_delim;
+begin
+  if sym <> '' then begin;
+      say_phoneme(sym);
+      sym := '';
+  end;
+end;
+
+procedure parse_char(c: char);
+begin;
+   if (c=' ') or (c=chr(10)) or (c=chr(13)) then begin;
+      parse_delim;
+   end else begin;
+      if length(sym)<255 then begin
+          sym := sym + c;
+      end;
+   end;
+end;
+
 procedure say_string(s: string);
 var
- i: integer;
- c: char;
- sym: string;
-begin;
- sym:='';
- for i:=1 to length(s) do begin;
-   c:=s[i];
-   if c=' ' then begin;
-      if sym <> '' then begin;
-          say_phoneme(sym);
-      end;
-      sym := '';
-   end else begin;
-      sym := sym + c;
-   end;
- end;
- if sym <> '' then begin;
-     say_phoneme(sym);
- end;
+  i: integer;
+begin
+  for i:=1 to length(s) do parse_char(s[i]);
+  parse_delim;
 end;
+
 
 procedure talker_setup(adriver: TOutputDriver; aport: integer);
 begin

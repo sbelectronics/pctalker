@@ -2,14 +2,13 @@ unit prncap;
 
 interface
 
-uses dos;
+uses dos, talker;
 
 procedure setup_prncap;
 
 implementation
 
 var
-  cap: string;
   old_exitproc: Pointer;
   old_int17: Pointer;
 
@@ -21,7 +20,6 @@ begin;
       setintvec($17, old_int17);
       old_int17:=NIL;
   end;
-  writeln('cap ', cap);
 end;
 
 {$F+}
@@ -34,7 +32,7 @@ begin
     al:=LO(_AX);
     if (ah=0) then begin;
        { print char }
-       cap:=cap+chr(al);
+       parse_char(chr(al));
        _AX:=0;
     end else if (ah=1) then begin;
        { initialize }
@@ -58,7 +56,6 @@ end;
 
 procedure setup_prncap;
 begin;
-  cap:='';
   old_int17 := NIL;
   old_exitproc := ExitProc;
   ExitProc := @printer_exithandler;

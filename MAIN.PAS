@@ -1,4 +1,6 @@
-uses talker;
+{$M 1024,0,0 }
+
+uses talker, prncap;
 
 type
   TArgs = record
@@ -6,6 +8,7 @@ type
            port: integer;
            say: string;
            filename: string;
+           prncap: boolean;
          end;
 var
   args: TArgs;
@@ -17,6 +20,7 @@ begin;
   args.driver:=OutputConsole;
   args.port:=$120;
   args.say:='';
+  args.prncap:=false;
   i:=1;
   while (i<=ParamCount) do begin;
     if ParamStr(i)='-D' then begin;
@@ -29,6 +33,8 @@ begin;
     end else if ParamStr(i)='-F' then begin;
         args.filename:=ParamStr(i+1);
         i:=i+1;
+    end else if ParamStr(i)='-L' then begin;
+        args.prncap:=true;
     end else begin;
        if args.say <> '' then args.say:=args.say+' ';
        args.say := args.say + ParamStr(i);
@@ -57,4 +63,10 @@ begin;
   if args.filename<>'' then say_file(args.filename);
   { stop speech }
   say_phoneme('PA4');
+
+  if args.prncap then begin
+    setup_prncap;
+    writeln('terminate and stay resident.');
+    keep(0);
+  end;
 end.
