@@ -9,6 +9,7 @@ procedure setup_prncap;
 implementation
 
 var
+  cap: string;
   old_exitproc: Pointer;
   old_int17: Pointer;
 
@@ -20,19 +21,20 @@ begin;
       setintvec($17, old_int17);
       old_int17:=NIL;
   end;
+  writeln('cap ', cap);
 end;
 
+{$F+}
 procedure printer_handler (_AX, _BX, _CX, _DX, _SI, _DI, _DS, _ES, _BP: Word); interrupt;
 var
  ah, al: byte;
 begin
-  writeln(_AX, ' ', _DX);
   if (_dx=2) then begin
     ah:=HI(_AX);
     al:=LO(_AX);
     if (ah=0) then begin;
        { print char }
-       writeln('rx', char(al));
+       cap:=cap+chr(al);
        _AX:=0;
     end else if (ah=1) then begin;
        { initialize }
@@ -52,9 +54,11 @@ begin
     end;
   end;
 end;
+{$F-}
 
 procedure setup_prncap;
 begin;
+  cap:='';
   old_int17 := NIL;
   old_exitproc := ExitProc;
   ExitProc := @printer_exithandler;
