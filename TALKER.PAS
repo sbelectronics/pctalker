@@ -220,6 +220,7 @@ begin
 
   driver:=adriver;
   sp0256_port:=aport;
+  sym:='';
   setup_phonemes;
 
   if (driver = OutputBackground) then begin

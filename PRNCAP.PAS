@@ -2,7 +2,7 @@ unit prncap;
 
 interface
 
-uses dos, talker;
+uses crt, dos, talker;
 
 procedure setup_prncap;
 
@@ -11,6 +11,9 @@ implementation
 var
   old_exitproc: Pointer;
   old_int17: Pointer;
+  SavedSS, SavedSP: Word;
+  OurSS, OurSP: Word;
+  thechar: char; { character to write }
 
 procedure printer_exithandler; far;
 begin;
@@ -22,17 +25,39 @@ begin;
   end;
 end;
 
+procedure handle_char;
+begin
+  asm
+    CLI
+  end;
+  SavedSS:=SSeg;
+  SavedSP:=SPtr;
+  asm
+    MOV SS, OurSS
+    MOV SP, OurSP
+    STI
+  end;
+  parse_char(thechar);
+  asm
+    CLI
+    MOV SS, SavedSS
+    MOV SP, SavedSP
+    STI
+  end;
+end;
+
 {$F+}
 procedure printer_handler (_AX, _BX, _CX, _DX, _SI, _DI, _DS, _ES, _BP: Word); interrupt;
 var
- ah, al: byte;
+  ah, al: byte;
 begin
   if (_dx=2) then begin
     ah:=HI(_AX);
     al:=LO(_AX);
     if (ah=0) then begin;
        { print char }
-       parse_char(chr(al));
+       thechar := chr(al); { must pass this in a global }
+       handle_char;        { ... because handle_char uses new stack }
        _AX:=0;
     end else if (ah=1) then begin;
        { initialize }
@@ -61,6 +86,8 @@ begin;
   ExitProc := @printer_exithandler;
   GetIntVec($17, old_int17);
   SetIntVec($17, @printer_handler);
+  OurSS := SSeg;
+  OurSP := SPtr;
 end;
 
 begin;

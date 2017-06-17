@@ -1,6 +1,6 @@
-{$M 1024,0,0 }
+{$M 4096,0,0 }
 
-uses talker, prncap;
+uses talker, prncap, dos;
 
 type
   TArgs = record
@@ -20,6 +20,7 @@ begin;
   args.driver:=OutputConsole;
   args.port:=$120;
   args.say:='';
+  args.filename:='';
   args.prncap:=false;
   i:=1;
   while (i<=ParamCount) do begin;
@@ -62,7 +63,14 @@ begin;
   if args.say<>'' then say_string(args.say);
   if args.filename<>'' then say_file(args.filename);
   { stop speech }
-  say_phoneme('PA4');
+
+  if (args.say<>'') or (args.filename<>'') then begin
+    say_phoneme('PA4');
+    if (args.driver = OutputBackground) then begin
+      writeln('press enter');
+      readln;
+    end;
+  end;
 
   if args.prncap then begin
     setup_prncap;

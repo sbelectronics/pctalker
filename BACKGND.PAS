@@ -66,6 +66,7 @@ var
 begin
   if ((port[sp0256_port] and 2) <> 2) then begin
      if dequeue(code) then begin
+        write(code, ' ');
         port[sp0256_port] := code;
      end;
   end;
@@ -80,6 +81,9 @@ end;
 
 procedure setup_background(port: integer);
 begin;
+  outbuf_in:=0;
+  outbuf_out:=0;
+  outbuf_count:=0;
   sp0256_port:=port;
   old_int1c := NIL;
   old_exitproc := ExitProc;
@@ -94,11 +98,12 @@ var
  i,dqc: integer;
  v: byte;
  last: byte;
+ junk: boolean;
 begin;
  last:=0;
  dqc:=0;
  for i:=1 to 10000 do begin;
-    enqueue(i);
+    junk:=enqueue(i);
     if ((i mod 7) = 2) or (i=10000) then begin;
         while dequeue(v) do begin;
           if (v<>((last+1) mod 256)) then begin;
