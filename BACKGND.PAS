@@ -1,3 +1,13 @@
+{ BACKGND.PAS - background processing loop
+  Scott Baker, http://www.smbaker.com/
+
+  This unit implements a background processing loop. Phonemes may be added
+  to the ring buffer by calling enqueue(). The background processing loop
+  attaches itself to int 1c, and on each interrupt will check to see if
+  the SP0256A-AL2 is idle, and if so, attempt to dequeue and send a new
+  phoneme to it.
+}
+
 unit backgnd;
 
 interface

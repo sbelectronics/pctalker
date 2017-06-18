@@ -1,3 +1,10 @@
+{ PRNCAP.PAS
+  Scott Baker, http://www.smbaker.com/
+
+  This unit implements a mechanism for capturing the lpt3: printer. It
+  does this by attaching itself to BIOS interrupt 17h.
+}
+
 unit prncap;
 
 interface

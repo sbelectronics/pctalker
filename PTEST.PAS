@@ -1,3 +1,11 @@
+{ PTEST.PAS
+  Scott Baker, http://www.smbaker.com/
+
+  Early testing program for the prncap unit.
+
+  Ignore
+}
+
 {$M 8192,0,0}
 uses prncap, dos;
 

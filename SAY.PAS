@@ -1,3 +1,12 @@
+{ SAY.PAS
+
+  Scott Baker, http://www.smbaker.com
+
+  This is the main file for the SP0256A-AL2 demo. It implements command
+  line parsing and calls the other units as necessary. Use the '-H'
+  command line option for help.
+}
+
 {$M 4096,0,0 }
 
 uses talker, prncap, dos;
@@ -104,8 +113,8 @@ begin;
   talker_setup(args.driver, args.port);
   if args.say<>'' then say_string(args.say);
   if args.filename<>'' then say_file(args.filename);
-  { stop speech }
 
+  { stop speech }
   if (args.say<>'') or (args.filename<>'') then begin
     say_phoneme('PA4');
     if (args.driver = OutputBackground) then begin

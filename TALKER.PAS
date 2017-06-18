@@ -1,3 +1,23 @@
+{ TALKER.PAS
+  Scott Baker, http://www.smbaker/com/
+
+  SP0256A-AL2 driver. This unit implements a driver for the SP0256A-AL2
+  speech synthesizer chip. Three output drivers are supported:
+
+    OutputConsole
+        Writes phonemes to the console. Doesn't speak. Used for debugging.
+
+    OutputDirect
+        Writes phonemes directly to the SP0256A-AL2. Busy-waits if the
+        chip is busy.
+
+    OutputBackground
+        Installs an interrupt handler to INT 1C. Phonemes are queued to
+        a ring buffer, and the ring buffer is emptied by the background
+        loop. If the ring buffer is full, then busy wait until there is
+        room in the ring buffer.
+}
+
 unit talker;
 
 interface
